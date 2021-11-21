@@ -135,10 +135,12 @@ public struct HexCoordinates
         this.x = x;
         this.z = z;
     }
+    //根据排、列获得所属单元格坐标
     public static HexCoordinates FromOffsetCoordinates (int x, int z)
     {
         return new HexCoordinates(x - z / 2, z);
     }
+    //根据三维坐标获得所属单元格坐标
     public static HexCoordinates FromPosition(Vector3 position)
     {
         float x = position.x / (HexMetrics.innerRadius * 2f);
