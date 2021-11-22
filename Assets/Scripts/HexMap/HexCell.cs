@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.IO;
 
 /// <summary>
 /// 单元格类
@@ -8,7 +7,8 @@ using UnityEngine;
 public class HexCell : MonoBehaviour
 {
     public HexCoordinates coordinates;
-    Color color;
+    //Color color;
+    int terrainTypeIndex = 0;
     int elevation = int.MinValue;
     public RectTransform uiRect;
 
@@ -58,16 +58,23 @@ public class HexCell : MonoBehaviour
     {
         get
         {
-            return color;
+            return HexMetrics.colors[terrainTypeIndex];
+        }
+    }
+
+    public int TerrainTypeIndex
+    {
+        get
+        {
+            return terrainTypeIndex;
         }
         set
         {
-            if (color == value)
+            if (terrainTypeIndex != value)
             {
-                return;
+                terrainTypeIndex = value;
+                Refresh();
             }
-            color = value;
-            Refresh();
         }
     }
 
@@ -234,5 +241,27 @@ public class HexCell : MonoBehaviour
     void RefreshSelfOnly()
     {
         chunk.Refresh();
+    }
+
+    public void Save(BinaryWriter writer)
+    {
+        writer.Write(terrainTypeIndex);
+        writer.Write(elevation);
+        //writer.Write(waterLevel);
+        //writer.Write(urbanLevel);
+        //writer.Write(farmLevel);
+        //writer.Write(plantLevel);
+        //writer.Write(specialIndex);
+    }
+
+    public void Load(BinaryReader reader)
+    {
+        terrainTypeIndex = reader.ReadInt32();
+        elevation = reader.ReadInt32();
+        //waterLevel = reader.ReadInt32();
+        //urbanLevel = reader.ReadInt32();
+        //farmLevel = reader.ReadInt32();
+        //plantLevel = reader.ReadInt32();
+        //specialIndex = reader.ReadInt32();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using System.IO;
 
 /// <summary>
 ///
@@ -8,13 +9,11 @@ public class HexMapEditor : MonoBehaviour
 {
     int brushSize;
 
-    public Color[] colors;
     public HexGrid hexGrid;
 
-    private Color activeColor;
+    int activeTerrainTypeIndex;
     int activeElevation;
 
-    bool applyColor;
     bool applyElevation = true;
 
     OptionalToggle riverMode;
@@ -44,9 +43,9 @@ public class HexMapEditor : MonoBehaviour
     {
         if (cell)
         {
-            if (applyColor)
+            if (activeTerrainTypeIndex >= 0)
             {
-                cell.Color = activeColor;
+                cell.TerrainTypeIndex = activeTerrainTypeIndex;
             }
             if (applyElevation)
             {
@@ -54,11 +53,6 @@ public class HexMapEditor : MonoBehaviour
             }
         }
         //hexGrid.Refresh();
-    }
-
-    private void Awake()
-    {
-        SelectColor(0);
     }
 
     void Update()
@@ -79,13 +73,10 @@ public class HexMapEditor : MonoBehaviour
             EditCells(hexGrid.GetCell(hit.point));
         }
     }
-    public void SelectColor(int index)
+
+    public void SetTerrainTypeIndex(int index)
     {
-        applyColor = index >= 0;
-        if (applyColor)
-        {
-            activeColor = colors[index];
-        }
+        activeTerrainTypeIndex = index;
     }
     public void SetElevation(float elevation)
     {
@@ -106,6 +97,25 @@ public class HexMapEditor : MonoBehaviour
     public void ShowUI(bool visible)
     {
         hexGrid.ShowUI(visible);
+    }
+
+    public void Save()
+    {
+        Debug.Log(Application.persistentDataPath);
+        string path = Path.Combine(Application.persistentDataPath, "test.map");
+        using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Create)))
+        {
+            hexGrid.Save(writer);
+        }
+    }
+
+    public void Load()
+    {
+        string path = Path.Combine(Application.persistentDataPath, "test.map");
+        using (BinaryReader reader = new BinaryReader(File.OpenRead(path)))
+        {
+            hexGrid.Load(reader);
+        }
     }
 }
 
